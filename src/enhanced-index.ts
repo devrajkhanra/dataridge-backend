@@ -26,6 +26,12 @@ import { CompanyRepository } from "./repositories/company.repository";
 // Enhanced controllers
 import enhancedCompanyRoutes from "./controllers/enhanced-company/index";
 
+// Construction-specific controllers
+import dailyReportsRoutes from "./controllers/construction/daily-reports";
+import changeOrdersRoutes from "./controllers/construction/change-orders";
+import rfisRoutes from "./controllers/construction/rfis";
+import materialTakeoffsRoutes from "./controllers/construction/material-takeoffs";
+
 // Legacy controllers (to be refactored)
 import dataRoutes from "./controllers/data/index";
 import laborRoutes from "./controllers/labor/index";
@@ -109,6 +115,24 @@ async function startServer() {
       await fastify.register(enhancedCompanyRoutes, { 
         prefix: '/api/v1',
         companyService: enhancedCompanyService 
+      });
+
+      // Construction-specific routes
+      await fastify.register(dailyReportsRoutes, { 
+        prefix: '/api/v1',
+        supabaseService 
+      });
+      await fastify.register(changeOrdersRoutes, { 
+        prefix: '/api/v1',
+        supabaseService 
+      });
+      await fastify.register(rfisRoutes, { 
+        prefix: '/api/v1',
+        supabaseService 
+      });
+      await fastify.register(materialTakeoffsRoutes, { 
+        prefix: '/api/v1',
+        supabaseService 
       });
 
       // Legacy routes (to be refactored)
