@@ -114,7 +114,6 @@ declare module "fastify" {
     restrictTo: (
       roles: string[]
     ) => (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
-    log: import("pino").Logger;
     logger: import("pino").Logger;
   }
 
