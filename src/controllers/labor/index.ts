@@ -25,7 +25,7 @@ const laborRoutes: FastifyPluginAsync<LaborRoutesOptions> = async (
         const designations = await designationsService.readDesignations();
         const { data, error } = await supabaseService
           .getClient()
-          .from("labor")
+          .from("labor_details")
           .select("*");
         if (error) throw error;
         return reply.send({ data, designations });
@@ -47,15 +47,18 @@ const laborRoutes: FastifyPluginAsync<LaborRoutesOptions> = async (
         await designationsService.saveDesignation(body.designation);
         const { data, error } = await supabaseService
           .getClient()
-          .from("labor")
+          .from("labor_details")
           .insert({ ...body, user_id: userId })
           .select();
         if (error) throw error;
 
         await fastify.supabase.from("notifications").insert({
-          type: "labor_added" as NotificationType,
+          action: "labor_added" as NotificationType,
           user_id: userId,
-          payload: body,
+          company_id: body.company_id,
+          project_id: body.project_id,
+          message: `Labor ${body.first_name} ${body.last_name} added`,
+          sent_to: { user_ids: [userId] },
         });
 
         return reply.send(data);
@@ -88,11 +91,6 @@ const laborRoutes: FastifyPluginAsync<LaborRoutesOptions> = async (
 
         const { designation } = designationSchema.parse(request.body);
         await designationsService.saveDesignation(designation);
-        await fastify.supabase.from("notifications").insert({
-          type: "designation_added" as NotificationType,
-          user_id: userId,
-          payload: { designation },
-        });
         return reply.send({ message: "Designation added" });
       } catch (err) {
         throw new Error("Failed to add designation");

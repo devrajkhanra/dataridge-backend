@@ -42,23 +42,23 @@ const projectsRoutes: FastifyPluginAsync<ProjectRoutesOptions> = async (
         const projectSchema: ProjectTableSchema = {
           id: crypto.randomUUID(),
           ...body,
-          column_name: body.columns[0].column_name,
-          data_type: body.columns[0].data_type,
-          is_required: body.columns[0].is_required,
-          constraints: body.columns[0].constraints,
+          status: "active",
         };
 
         const { data, error } = await supabaseService
           .getClient()
-          .from("project_schemas")
+          .from("project_table_schemas")
           .insert(projectSchema)
           .select();
         if (error) throw error;
 
         await fastify.supabase.from("notifications").insert({
-          type: "project_added" as NotificationType,
+          action: "project_added" as NotificationType,
           user_id: userId,
-          payload: projectSchema,
+          company_id: body.company_id,
+          project_id: body.project_id,
+          message: `Project schema ${body.table_name} added`,
+          sent_to: { user_ids: [userId] },
         });
 
         return reply.send(data);

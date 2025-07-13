@@ -13,9 +13,6 @@ export interface JwtPayload {
 export interface CompanyUserSchema {
   id: string;
   company_id: string;
-  status: string;
-  created_at: string;
-  updated_at: string;
   table_name: string;
   column_name: string;
   data_type:
@@ -30,19 +27,31 @@ export interface CompanyUserSchema {
     | "UUID";
   is_required: boolean;
   constraints?: string[];
+  status: "active" | "pending_removal";
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Labor {
   id: string;
-  address: string;
+  company_id: string;
   user_id: string;
-  status: "active" | "inactive" | "terminated";
+  project_id: string;
+  first_name: string;
+  last_name: string;
+  employee_id: string;
   pf_number: string;
   esi_number: string;
+  designation: string;
+  contact_number: string;
+  emergency_contact: string;
+  address: string;
+  date_of_birth: string | null;
   joining_date: string;
+  training_records: any;
+  status: "active" | "inactive" | "terminated";
   created_at: string;
   updated_at: string;
-  designation: string;
 }
 
 export interface ProjectTableSchema {
@@ -63,6 +72,9 @@ export interface ProjectTableSchema {
     | "UUID";
   is_required: boolean;
   constraints?: string[];
+  status: "active" | "pending_removal";
+  created_at: string;
+  updated_at: string;
   columns?: Array<{
     column_name: string;
     data_type:
@@ -92,10 +104,7 @@ export type NotificationType =
   | "company_added"
   | "user_added"
   | "role_added"
-  | "role_updated"
-  | "project_added"
-  | "template_added"
-  | "designation_added";
+  | "role_updated";
 
 // Fastify extensions
 declare module "fastify" {
@@ -105,7 +114,7 @@ declare module "fastify" {
     restrictTo: (
       roles: string[]
     ) => (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
-    logger: import("pino").Logger;
+    log: import("pino").Logger;
   }
 
   interface FastifyRequest {

@@ -3,7 +3,10 @@ import { CompanyUserSchema } from "../../types";
 
 export const companySchema = z.object({
   name: z.string().min(1),
-  description: z.string().optional(),
+  logo_url: z.string().optional(),
+  contact_email: z.string().email(),
+  contact_phone: z.string().optional(),
+  address: z.string().optional(),
 });
 
 export const companyUserSchema = z.object({
@@ -12,9 +15,6 @@ export const companyUserSchema = z.object({
     .uuid()
     .default(() => crypto.randomUUID()),
   company_id: z.string().default("default"),
-  status: z.string().default("active"),
-  created_at: z.string().default(() => new Date().toISOString()),
-  updated_at: z.string().default(() => new Date().toISOString()),
   table_name: z.string().min(1),
   column_name: z.string().min(1),
   data_type: z.enum([
@@ -30,4 +30,7 @@ export const companyUserSchema = z.object({
   ]),
   is_required: z.boolean(),
   constraints: z.array(z.string()).optional(),
+  status: z.enum(["active", "pending_removal"]).default("active"),
+  created_at: z.string().default(() => new Date().toISOString()),
+  updated_at: z.string().default(() => new Date().toISOString()),
 }) satisfies z.ZodType<CompanyUserSchema>;

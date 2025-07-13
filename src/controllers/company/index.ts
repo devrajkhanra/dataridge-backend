@@ -69,7 +69,7 @@ const companyRoutes: FastifyPluginAsync<CompanyRoutesOptions> = async (
 
         const { data, error } = await supabaseService
           .getClient()
-          .from("company_schemas")
+          .from("company_user_schemas")
           .insert(formattedSchemas)
           .select();
         if (error) throw error;

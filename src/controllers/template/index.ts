@@ -21,9 +21,9 @@ const templateRoutes: FastifyPluginAsync<TemplateRoutesOptions> = async (
 
         const { data, error } = await supabaseService
           .getClient()
-          .from("templates")
+          .from("saved_table_templates")
           .select("*")
-          .eq("user_id", userId);
+          .eq("created_by", userId);
         if (error) throw error;
         return reply.send(data);
       } catch (err) {
@@ -43,15 +43,17 @@ const templateRoutes: FastifyPluginAsync<TemplateRoutesOptions> = async (
         const body = templateSchema.parse(request.body);
         const { data, error } = await supabaseService
           .getClient()
-          .from("templates")
-          .insert({ ...body, user_id: userId })
+          .from("saved_table_templates")
+          .insert({ ...body, created_by: userId })
           .select();
         if (error) throw error;
 
         await fastify.supabase.from("notifications").insert({
-          type: "template_added" as NotificationType,
+          action: "template_added" as NotificationType,
           user_id: userId,
-          payload: body,
+          company_id: body.company_id,
+          message: `Template ${body.template_name} added`,
+          sent_to: { user_ids: [userId] },
         });
 
         return reply.send(data);

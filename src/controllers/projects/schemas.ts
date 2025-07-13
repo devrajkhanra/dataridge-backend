@@ -19,6 +19,7 @@ export const projectSchema = z.object({
   ]),
   is_required: z.boolean(),
   constraints: z.array(z.string()).optional(),
+  status: z.enum(["active", "pending_removal"]).default("active"),
   columns: z
     .array(
       z.object({
@@ -39,4 +40,6 @@ export const projectSchema = z.object({
       })
     )
     .min(1),
-}) satisfies z.ZodType<ProjectTableSchema>;
+}) satisfies z.ZodType<
+  Omit<ProjectTableSchema, "id" | "created_at" | "updated_at">
+>;
