@@ -282,3 +282,5 @@ export abstract class BaseRepository<T extends { id: string }> {
     }
   }
 }
+
+export { BaseRepository }
