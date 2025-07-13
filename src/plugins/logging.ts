@@ -18,8 +18,3 @@ const loggingPlugin: FastifyPluginAsync = async (fastify) => {
 
 export default fp(loggingPlugin, { name: "logging" });
 
-declare module "fastify" {
-  interface FastifyInstance {
-    logger: import("pino").Logger;
-  }
-}

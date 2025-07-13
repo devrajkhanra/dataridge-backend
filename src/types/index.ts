@@ -11,8 +11,8 @@ export interface JwtPayload {
 
 // Shared interfaces
 export interface CompanyUserSchema {
-  id: string;
-  company_id: string;
+  id?: string;
+  company_id?: string;
   table_name: string;
   column_name: string;
   data_type:
@@ -27,9 +27,9 @@ export interface CompanyUserSchema {
     | "UUID";
   is_required: boolean;
   constraints?: string[];
-  status: "active" | "pending_removal";
-  created_at: string;
-  updated_at: string;
+  status?: "active" | "pending_removal";
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Labor {
@@ -115,6 +115,7 @@ declare module "fastify" {
       roles: string[]
     ) => (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
     log: import("pino").Logger;
+    logger: import("pino").Logger;
   }
 
   interface FastifyRequest {
