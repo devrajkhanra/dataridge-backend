@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { NotificationType } from "../types";
+import { NotificationType } from "../types/index";
 
 export class NotificationService {
   private fastify: FastifyInstance;
@@ -18,8 +18,6 @@ export class NotificationService {
         });
       if (error) throw error;
     } catch (err) {
-      const error = err as Error;
-      this.fastify.log.error(error.message);
       throw new Error("Failed to notify role change");
     }
   }
@@ -34,8 +32,6 @@ export class NotificationService {
         });
       if (error) throw error;
     } catch (err) {
-      const error = err as Error;
-      this.fastify.log.error(error.message);
       throw new Error("Failed to notify user change");
     }
   }
@@ -47,8 +43,6 @@ export class NotificationService {
         .insert({ type, payload });
       if (error) throw error;
     } catch (err) {
-      const error = err as Error;
-      this.fastify.log.error(error.message);
       throw new Error("Failed to send notification");
     }
   }

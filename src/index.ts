@@ -1,40 +1,49 @@
+import "dotenv/config";
 import fastify from "fastify";
-import jwt from "@fastify/jwt";
-import authPlugin from "./plugins/auth.plugin";
-import loggingPlugin from "./plugins/logging.plugin";
-import restrictToPlugin from "./plugins/restrictTo";
-import { companyController } from "./controllers/company.controller";
-import { dataController } from "./controllers/data.controller";
-import { laborController } from "./controllers/labor.controller";
-import { projectsController } from "./controllers/projects.controller";
-import { rolesController } from "./controllers/roles.controller";
-import { schemaController } from "./controllers/schema.controller";
-import { templateController } from "./controllers/template.controller";
-import { usersController } from "./controllers/users.controller";
+import jwtPlugin from "./plugins/jwt";
+import loggingPlugin from "./plugins/logging";
+import supabasePlugin from "./plugins/supabase";
+import errorMiddleware from "./middleware/error";
+import companyRoutes from "./controllers/company/index";
+import dataRoutes from "./controllers/data/index";
+import laborRoutes from "./controllers/labor/index";
+import projectsRoutes from "./controllers/projects/index";
+import rolesRoutes from "./controllers/roles/index";
+import schemaRoutes from "./controllers/schema/index";
+import templateRoutes from "./controllers/template/index";
+import usersRoutes from "./controllers/users/index";
 import { SupabaseService } from "./services/supabase.service";
-import { FileService } from "./utils/file.utils";
+import { DesignationsService } from "./services/designations.service";
 
 const app = fastify({ logger: true });
-app.register(jwt, { secret: "your-secret" });
-app.register(restrictToPlugin);
-app.register(authPlugin);
+
+// Register plugins
+app.register(jwtPlugin);
 app.register(loggingPlugin);
+app.register(supabasePlugin);
 
+// Register error middleware
+app.setErrorHandler(errorMiddleware);
+
+// Initialize services
 const supabaseService = new SupabaseService();
-const fileService = new FileService(app);
+const designationsService = new DesignationsService();
 
-app.register(async (fastify) => companyController(fastify, supabaseService));
-app.register(async (fastify) => dataController(fastify, supabaseService));
-app.register(async (fastify) =>
-  laborController(fastify, fileService, supabaseService)
-);
-app.register(async (fastify) => projectsController(fastify, supabaseService));
-app.register(async (fastify) => rolesController(fastify, supabaseService));
-app.register(async (fastify) => schemaController(fastify, supabaseService));
-app.register(async (fastify) => templateController(fastify, supabaseService));
-app.register(async (fastify) => usersController(fastify, supabaseService));
+// Register routes
+app.register(companyRoutes, { supabaseService });
+app.register(dataRoutes, { supabaseService });
+app.register(laborRoutes, { supabaseService, designationsService });
+app.register(projectsRoutes, { supabaseService });
+app.register(rolesRoutes, { supabaseService });
+app.register(schemaRoutes, { supabaseService });
+app.register(templateRoutes, { supabaseService });
+app.register(usersRoutes, { supabaseService });
 
+// Start server
 app.listen({ port: 3000 }, (err) => {
-  if (err) console.error(err);
-  console.log("Server running on port 3000");
+  if (err) {
+    app.log.error(err);
+    process.exit(1);
+  }
+  app.log.info("Server running on port 3000");
 });

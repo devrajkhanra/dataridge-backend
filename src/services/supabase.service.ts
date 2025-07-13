@@ -1,11 +1,13 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import { ProjectTableSchema } from "../types";
+import { PostgrestError } from "@supabase/supabase-js";
+import { ProjectTableSchema } from "../types/index";
+import env from "../config/env";
 
 export class SupabaseService {
   private client: SupabaseClient;
 
   constructor() {
-    this.client = createClient("your-supabase-url", "your-supabase-key");
+    this.client = createClient(env.SUPABASE_URL, env.SUPABASE_KEY);
   }
 
   public getClient(): SupabaseClient {
@@ -25,8 +27,8 @@ export class SupabaseService {
         });
         if (error) throw error;
       }
-    } catch (err) {
-      const error = err as Error;
+    } catch (err: unknown) {
+      const error = err as PostgrestError;
       throw new Error(`Failed to create table: ${error.message}`);
     }
   }
@@ -44,8 +46,8 @@ export class SupabaseService {
         });
         if (error) throw error;
       }
-    } catch (err) {
-      const error = err as Error;
+    } catch (err: unknown) {
+      const error = err as PostgrestError;
       throw new Error(`Failed to modify table: ${error.message}`);
     }
   }
